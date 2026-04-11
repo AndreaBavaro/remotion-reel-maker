@@ -25,8 +25,9 @@ The `reel-editor` skill is the DOWNSTREAM step that this skill hands off to. It 
 
 Before doing ANY work:
 
-1. Read the production memory at `~/.claude/projects/-Users-andrea-Projects-Remotion/memory/feedback_remotion_workflow.md` — you need to understand the viral editing principles and what works
-2. Understand the reel-editor brief format by reading `.claude/skills/reel-editor/brief-template.md`
+1. Read the production memory at `~/.claude/projects/-Users-andrea-Projects-Remotion/memory/feedback_remotion_workflow.md` (if it exists) — you need to understand the viral editing principles and what works
+2. Read the reel feedback log at `.claude/memory/reel-feedback.md` — pay special attention to the **Active Learnings** section. These are rules extracted from real user feedback on past reels and they **override defaults** when they conflict.
+3. Understand the reel-editor brief format by reading `.claude/skills/reel-editor/brief-template.md`
 
 ---
 
@@ -200,7 +201,7 @@ If all assets are already present, skip straight to Step 4.
 
 Now that all assets are accounted for, think like a creative director.
 
-### 4a. Identify the hook (first 1-1.5 seconds)
+### 4a. Identify the hook (first 1-1.5 seconds) — MANDATORY VISUAL CUT IN FIRST 2 SECONDS
 
 Scan ALL transcriptions. Which line is the strongest scroll-stopper? It should be:
 - A bold claim ("This app pays you to go out")
@@ -209,6 +210,14 @@ Scan ALL transcriptions. Which line is the strongest scroll-stopper? It should b
 - A direct challenge ("You're wasting money going out wrong")
 
 The hook MUST come first. If the best hook line is in facecam clip 3, reorder so clip 3 plays first.
+
+**⚠️ MANDATORY: There MUST be a visual cut (scene change, image insert, or flash cut to a different shot) within the first 2 seconds.** The viewer decides to stay or scroll in under 2 seconds — a static talking head for the opening loses them. Even if the hook line is strong, pair it with a visual change:
+- Start on facecam for 1-1.5s → cut to a proof image or screen recording insert
+- Start on a bold text/image for 1s → cut to facecam delivering the hook
+- Start on facecam → flash cut to a different angle or tighter crop at 1.5s
+- Start on B-roll → cut to facecam at 1.5s
+
+**This is non-negotiable.** If the plan has the same shot for the first 2+ seconds with no visual change, it fails review. Restructure until there's a cut.
 
 ### 4b. Map the viral arc
 
@@ -544,3 +553,52 @@ If the clips don't have a strong hook, or the transcription is too rambling, or 
 ### Scenario: Multiple reels from one batch of assets
 If there are enough assets for 2+ reels:
 → Suggest it. "I see enough material here for 2 reels: one about the prize money, one about how the app works. Want me to plan both?"
+
+---
+
+## EXAMPLE: WELL-STRUCTURED REEL (use as reference)
+
+This is a gold-standard reel plan. Study the pacing, the mandatory first cut, and how every section earns the next second of attention.
+
+```
+REEL PLAN: "This App Pays You $100 to Go Out"
+
+TOTAL DURATION: ~16 seconds
+FORMAT: Facecam + proof inserts + screen recording + CTA
+
+SEQUENCE:
+0.0s - 1.2s   | facecam1.MOV          | HOOK: "This app literally pays you to go to bars"
+               |                        | ⚡ MANDATORY CUT at 1.2s — do NOT stay on this shot longer
+1.2s - 1.7s   | etransfer-proof.png   | INSERT: $100 e-transfer screenshot (proves the claim IMMEDIATELY)
+1.7s - 2.2s   | winner-text.png       | INSERT: Winner DM reaction ("NO WAY 😭")
+2.2s - 2.7s   | etransfer-proof2.png  | INSERT: Second e-transfer (rapid-fire proof montage)
+               | (facecam1 AUDIO continues playing under all inserts above)
+2.7s - 5.0s   | facecam2.MOV          | ESCALATION: "You go out, spend 30 seconds rating a bar, and earn points"
+5.0s - 7.5s   | screen-rec.MOV @4.8s  | TRANSITION: Screen recording — submitting a bar on Nitely (trimmed insert)
+7.5s - 8.5s   | screen-rec.MOV @7.2s  | Screen recording — points earned animation (trimmed insert)
+               | (facecam2 AUDIO continues playing under screen recording)
+8.5s - 12.0s  | facecam3.MOV          | SOLUTION: "Every point is a raffle entry — every week we give away a hundred bucks"
+               | 💰 "+$100" pop-up synced to word "hundred" at ~11s
+12.0s - 14.0s | facecam3.MOV cont.    | CTA: "Download Nitely, link in bio"
+               | "DOWNLOAD NITELY" text overlay at 12.5s
+14.0s - 16.0s | OUTRO                 | Nitely logo + "Link in bio 👇" + background music swell
+
+VIRAL ARC:
+  Hook (0-20%):       "pays you to go to bars" — bold, unbelievable claim
+  Proof (20-35%):     E-transfer + DM montage — backs up the claim in <2 seconds
+  Escalation (35-50%): How it works — rate bars, earn points
+  Transition (50-60%): Screen recording — see the actual app
+  Solution (60-85%):   Points → raffle → $100 cash every week
+  CTA (85-100%):       "Download Nitely, link in bio"
+
+WHY THIS WORKS:
+1. FIRST CUT AT 1.2s — viewer sees a new image before they can scroll away
+2. Proof montage (1.2s-2.7s) — three rapid images in 1.5 seconds. High visual energy.
+3. Audio continuity — facecam voice plays UNDER the image inserts, so there's no dead air
+4. Screen recording is SHORT (2.5s total, split into 2 inserts) — never boring
+5. Text overlays only at peak moments ("$100", "DOWNLOAD NITELY") — not cluttered
+6. Product name (Nitely) appears LAST for stickiness
+7. Every section earns the next 2-3 seconds — nothing stays static
+```
+
+**Use this structure as your baseline.** Every reel you plan should hit these same beats: immediate visual cut, proof early, screen recordings trimmed short, audio continuity across visual inserts, product name last.

@@ -15,20 +15,17 @@ Go to claude.ai/download and install the Claude desktop app for Mac. Sign in wit
 Go to desktop.github.com and install GitHub Desktop. Sign in with your GitHub account. You will only ever need two buttons: Pull and Push.
 
 **Step 3: Clone the Remotion Project**
-In GitHub Desktop, click File > Clone Repository. Find the Nitely Remotion repo (Andrea will share the link). Clone it somewhere you will remember, like `~/Documents/Remotion`.
+In GitHub Desktop, click File > Clone Repository. Find `AndreaBavaro/remotion-reel-maker`. Clone it somewhere you'll remember, like `~/Documents/Remotion`.
 
-**Step 4: Install Node.js**
-Go to nodejs.org and download the LTS version for Mac. Install it.
+**Step 4: Run the Setup Script**
+In Finder, go to the Remotion project folder and double-click `setup.command`. This installs everything automatically: Node.js, ffmpeg, git-filter-repo, and all project dependencies. Just follow the prompts — it takes about 5 minutes.
 
-**Step 5: Install Project Dependencies (one time only)**
-Open Terminal (search "Terminal" in Spotlight). Type this and press Enter:
-```
-cd ~/Documents/Remotion && npm install
-```
-Replace the path with wherever you cloned the project. Wait for it to finish. You can close Terminal after this.
+If the script won't open, right-click it > Open > Open. macOS blocks double-click on new scripts the first time.
 
-**Step 6: Test the Preview**
-In Finder, go to the Remotion project folder and double-click `preview.command`. A browser window should open showing Remotion Studio. If you see the video editor interface, everything is working.
+**Step 5: Test the Preview**
+Double-click `preview.command` in the project folder. A browser window should open showing Remotion Studio. If you see the video editor interface, everything is working.
+
+That's it for setup. You're ready to edit reels.
 
 ---
 
@@ -42,7 +39,8 @@ This is what you do every time you want to edit a reel. About 5 minutes of your 
 4. **Tell Claude what you want** — See example prompts below.
 5. **Preview** — Double-click `preview.command`, select the reel from the sidebar, press play.
 6. **Request changes** — Tell Claude what to fix in plain English.
-7. **Push** — Open GitHub Desktop, type a short message (like "built reel7"), click Commit, then Push.
+7. **Rate the reel** — Claude will ask you to rate it 1-10 and give feedback (see Part 5).
+8. **Push** — Open GitHub Desktop, type a short message (like "built reel7"), click Commit, then Push.
 
 ---
 
@@ -58,7 +56,7 @@ Claude will scan every file, transcribe the audio, recommend visual inserts, tel
 
 ### Option B: You already have a brief
 
-If a `brief.txt` already exists in the reel folder, tell Claude:
+If a `brief.txt` already exists in the reel folder (or Andrea wrote one), tell Claude:
 
 > "Build reel7 using the reel-editor skill"
 
@@ -79,20 +77,20 @@ All reels with a `brief.txt` get processed automatically. Check `out/batch-log-[
 After Claude analyzes your clips, it walks you through 7 questions, one at a time. If everything looks good early, just say "all good" and it skips ahead.
 
 ### Q1: Hook Check
-Claude shows the opening clip/line and asks if it is strong enough.
+Claude shows the opening clip/line and asks if it's strong enough. **Important:** there must always be a visual cut (scene change) in the first 2 seconds — Claude enforces this automatically.
 
 Example responses:
-- "Yes that is good"
+- "Yes that's good"
 - "No, use clip 3 as the hook instead"
 - "I want to re-record a punchier opening"
 
 ### Q2: Missing Media
-Claude lists every file it is using and asks if you want to add anything — extra screenshots, screen recordings, B-roll.
+Claude lists every file it's using and asks if you want to add anything — extra screenshots, screen recordings, B-roll.
 
 Example responses:
 - "Add the screen recording I just put in the folder"
 - "I need to add proof screenshots, hold on"
-- "That is everything"
+- "That's everything"
 
 ### Q3: Caption Script
 Claude shows the full transcription of your audio with timestamps. Captions are always generated from what you actually said.
@@ -134,7 +132,33 @@ Example responses:
 
 ---
 
-## Part 5: Previewing & Making Changes
+## Part 5: Feedback & Rating
+
+After every reel is finished and you're happy with the preview, Claude asks you to rate it. **This is how the system gets smarter over time** — your feedback directly changes how future reels are built.
+
+### How it works
+
+1. **Claude asks for a rating (1-10).** Just give a number. 1 = terrible, start over. 10 = perfect, post it now.
+
+2. **Claude asks what worked and what didn't.** Be as specific as you can:
+   - Good: "The proof montage right after the hook was fire"
+   - Good: "Pacing felt right, captions were clean"
+   - Bad: "The screen recording was way too long"
+   - Bad: "Hook was weak, should've started with the e-transfer"
+   - Bad: "Captions were too small to read on my phone"
+
+3. **Claude saves your feedback.** It extracts a rule (like "keep screen recordings under 1.5 seconds") and saves it to a feedback file that both skills read before starting any new reel.
+
+4. **Future reels follow your preferences.** After a few reels, the system builds up a personalized style guide from your ratings. If you said proof montages work best right after the hook, every future reel will do that by default.
+
+### Tips for good feedback
+- Be specific, not vague. "It was fine" doesn't help. "The hook was strong but the screen recording at 6 seconds felt slow" teaches the system something.
+- If you just like it and have nothing to change, a quick "9/10, all good" is fine.
+- You can always go back and tell Claude to adjust things before rating.
+
+---
+
+## Part 6: Previewing & Making Changes
 
 ### How to Preview
 Double-click `preview.command` in the project folder. Remotion Studio opens in your browser. Select the reel from the left sidebar and press play.
@@ -155,7 +179,7 @@ When happy, tell Claude: "Render reel7 to mp4." The finished video appears in th
 
 ---
 
-## Part 6: Syncing with Your Partner
+## Part 7: Syncing with Your Partner
 
 ### The Simple Rule
 Before you start: **Pull**. When you are done: **Commit and Push**.
@@ -163,7 +187,7 @@ Before you start: **Pull**. When you are done: **Commit and Push**.
 ### What syncs through GitHub
 - `brief.txt` files (reel descriptions)
 - Remotion source code (compositions Claude builds)
-- Skills and settings (so you both have the same Claude workflow)
+- Skills, settings, and feedback log (so you both have the same Claude workflow and learnings)
 
 ### What does NOT sync through GitHub
 Video clips (.MOV, .mp4), audio files (.wav), and rendered output are too large for git. Share these via AirDrop, Google Drive, or a shared iCloud folder.
@@ -179,21 +203,24 @@ Do not both edit the same reel at the same time. Work on different reels and you
 ### How to Push
 1. Open GitHub Desktop
 2. Type a short message in the Summary box (e.g. "built reel7")
-3. Click "Commit to main"
+3. Click "Commit to master"
 4. Click "Push origin"
 5. Done
 
 ---
 
-## Part 7: Quick Reference
+## Part 8: Quick Reference
 
 ### Folder Structure
 ```
-public/reels/reel1/     Raw clips, brief.txt, and generated files for each reel
-src/reels/reel1/         Remotion source code Claude generates
-out/                     Rendered .mp4 files ready to post
-.claude/skills/          The reel-planner and reel-editor skills (do not modify)
-preview.command          Double-click to open Remotion Studio
+public/reels/reel1/         Raw clips, brief.txt, and generated files for each reel
+src/reels/reel1/            Remotion source code Claude generates
+out/                        Rendered .mp4 files ready to post
+.claude/skills/             The reel-planner and reel-editor skills (do not modify)
+.claude/memory/             Feedback log — your ratings teach the system (do not delete)
+setup.command               Double-click to install all dependencies (one time)
+preview.command             Double-click to open Remotion Studio
+EDITING_GUIDE.md            This file
 ```
 
 ### Common Cowork Prompts
@@ -212,14 +239,27 @@ When Claude asks for a screen recording, you can either:
 - **One long recording** (15-20s) showing different features in order. Tell Claude roughly when each thing appears ("wait time at 3s, cover at 7s") or let it auto-detect.
 - **Multiple short clips** (2-3s each) for each moment. Name them descriptively (screen-waittime.MOV, screen-cover.MOV).
 
+### Key Rules Claude Follows Automatically
+- There's always a visual cut in the first 2 seconds (no static openings)
+- Flash cuts between every clip transition
+- Captions are generated from your actual audio (never made up)
+- Product name (Nitely) always appears last
+- Text overlays use spring animations
+- All content stays within Instagram safe zones
+- Your past feedback ratings influence every new reel
+
 ### Troubleshooting
 
-**Preview does not open:** Make sure you ran `npm install` (Part 1, Step 5). If it still fails, open Terminal and run: `cd ~/Documents/Remotion && npx remotion studio`
+**setup.command won't open:** Right-click > Open > Open. macOS blocks new scripts the first time.
 
-**Claude cannot find clips:** Make sure files are in the right folder (`public/reels/reel7/` not just `public/reels/`). Check that you selected the Remotion folder when starting Cowork.
+**Preview does not open:** Make sure you ran setup.command first. If it still fails, open Terminal and run: `cd ~/Documents/Remotion && npx remotion studio`
+
+**Claude can't find clips:** Make sure files are in the right folder (`public/reels/reel7/` not just `public/reels/`). Check that you selected the Remotion folder when starting Cowork.
 
 **GitHub shows a merge conflict:** You and your partner probably edited the same file. Ask Claude in Cowork to help resolve it.
 
-**Reel looks wrong in preview:** Tell Claude exactly what is wrong ("captions are overlapping", "clip 3 plays at the wrong time"). It will fix and re-check.
+**Reel looks wrong in preview:** Tell Claude exactly what's wrong ("captions are overlapping", "clip 3 plays at the wrong time"). It will fix and re-check.
 
 **Starting over:** Tell Claude "Delete everything for reel7 and start fresh" or just create a new folder (reel8).
+
+**Something broke after pulling:** Run `npm install` in Terminal (or double-click setup.command again). Dependencies may have been updated.

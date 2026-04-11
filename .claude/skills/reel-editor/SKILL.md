@@ -25,8 +25,9 @@ If the reel-planner has already run, Phase 0 (Asset Discovery) can be fast-track
 Before doing ANY work, you MUST:
 
 1. Read the Remotion best practices skill at `skills/remotion-best-practices/SKILL.md` (symlinked in the project root). Read any sub-rule files relevant to your task (animations, subtitles, sequencing, transitions, text-animations, videos, audio, timing, etc.)
-2. Read the production memory at `~/.claude/projects/-Users-andrea-Projects-Remotion/memory/feedback_remotion_workflow.md`
-3. Confirm you understand the rules from both before proceeding
+2. Read the production memory at `~/.claude/projects/-Users-andrea-Projects-Remotion/memory/feedback_remotion_workflow.md` (if it exists)
+3. Read the reel feedback log at `.claude/memory/reel-feedback.md` — pay special attention to the **Active Learnings** section. These are rules extracted from real user feedback on past reels and they **override defaults** when they conflict.
+4. Confirm you understand the rules from all sources before proceeding
 
 These are non-negotiable. If you skip them, you WILL make mistakes that have already been solved.
 
@@ -207,6 +208,7 @@ From the brief + asset analysis, generate a complete `spec.json` inside the reel
 
 ### Viral Arc
 - Hook (0-30%): First 1-2 seconds must stop the scroll
+- **⚠️ MANDATORY: Visual cut within the first 2 seconds** — there MUST be a scene change, image insert, or flash cut to a different shot before the 2-second mark. A static talking head opening loses viewers. See the EXAMPLE REEL section below for how to structure this.
 - Escalation (30-50%): Build the problem or tension
 - Transition (50-60%): Pivot moment
 - Solution (60-85%): Reveal the answer
@@ -359,6 +361,7 @@ After the initial build, run this entire checklist against your own work. Fix an
 - [ ] Flash cuts at z-index 30
 
 ### CONTENT CHECK
+- [ ] **MANDATORY FIRST CUT: There is a visual change (different clip, image insert, or flash cut) within the first 2 seconds (60 frames @30fps).** If the same shot runs longer than 2 seconds at the start, this is a FAIL — restructure the timeline.
 - [ ] No hardcoded text strings in any scene component — run `grep -r` across `src/` for any quoted strings that look like display text
 - [ ] Flash cuts exist at every clip boundary
 - [ ] All text overlays use spring animation
@@ -390,6 +393,76 @@ When the user gives feedback after previewing:
 2. Make the changes
 3. Run the FULL Phase 4 self-review checklist again
 4. Report back
+
+---
+
+## PHASE 6: FEEDBACK & LEARNING
+
+After the user has previewed the reel and is satisfied (or after final render), collect structured feedback. This is how the system gets smarter over time.
+
+### Step 1: Ask for a rating
+
+> "The reel is done! Before we move on, quick feedback loop — **rate this reel 1-10** (1 = start over, 10 = perfect, post it now)."
+
+Wait for the number.
+
+### Step 2: Ask targeted follow-ups based on rating
+
+**If rating is 8-10 (great):**
+> "Nice — what specifically worked well? For example: the hook, the pacing, the proof montage, the captions, the text overlays, the music, the ending? I'll remember what hit so I can repeat it."
+
+**If rating is 4-7 (decent but needs work):**
+> "What should stay the same, and what should be different next time? Be specific — for example: 'the hook was weak', 'captions were too fast', 'screen recording was too long', 'text overlays were cluttered', 'wrong clip order'."
+
+**If rating is 1-3 (bad):**
+> "What went wrong? Walk me through what you'd change. I'll log it so this mistake doesn't happen again."
+
+Wait for the response.
+
+### Step 3: Write to the feedback log
+
+Append a structured entry to `.claude/memory/reel-feedback.md`:
+
+```markdown
+### Reel: [reel-id] — "[concept]"
+**Date:** [today's date]
+**Rating:** [X]/10
+
+**What worked (KEEP):**
+- [extract from user's response]
+
+**What was wrong (CHANGE):**
+- [extract from user's response]
+
+**Extracted learning:**
+> [Distill into ONE clear, actionable rule. E.g., "Screen recordings should never exceed 2 seconds per insert" or "Always lead with e-transfer proof after the hook, not app screenshots"]
+```
+
+### Step 4: Update the Active Learnings section
+
+Read the existing "Active Learnings" section in `.claude/memory/reel-feedback.md`. Add the new learning as a bullet point. If the new learning contradicts an older one, replace the older one.
+
+Example Active Learnings section after a few reels:
+
+```markdown
+## Active Learnings (apply to ALL future reels)
+
+- Screen recording inserts should be 1-1.5s max, not 2-3s — viewers lose interest (from reel-002, rating 5/10)
+- Proof montage (e-transfers + DMs) right after the hook is the strongest pattern — always use it when proof assets exist (from reel-001, rating 9/10)
+- Caption font size 48 is too small on some phones — bump to 56 (from reel-003, rating 7/10)
+- Flash cuts between image inserts feel too aggressive when there are 4+ images in a row — use crossfade for image-to-image, flash cuts for clip-to-clip (from reel-004, rating 6/10)
+```
+
+### Step 5: Confirm to the user
+
+> "Logged. I'll apply [summary of learning] to every reel going forward. Ready for the next one?"
+
+### Feedback rules
+- **ALWAYS ask for feedback** after a reel is finished — never skip this phase
+- Keep the questions conversational, not like a survey
+- The extracted learning should be **specific and actionable** — not vague ("make it better") but concrete ("reduce screen recording inserts to 1.5s max")
+- If the user gives vague feedback ("it was fine"), probe once: "Anything specific that could be tighter? Pacing, hook, captions, overlays?" If they say "nah it's good," log the rating with "No specific changes requested" and move on
+- In **autonomous mode (MODE: AUTO)**, skip this phase — no user to give feedback
 
 ---
 
@@ -612,8 +685,68 @@ out/[reel-id].mp4
 
 ---
 
+## EXAMPLE: WELL-STRUCTURED REEL (use as reference)
+
+This is a gold-standard reel spec. Study the pacing, the mandatory first cut, and how the timeline translates to Remotion code.
+
+```
+SPEC SUMMARY: "This App Pays You $100 to Go Out"
+
+TOTAL DURATION: 16s (480 frames @30fps)
+FORMAT: Facecam + proof inserts + screen recording + CTA
+
+TIMELINE:
+Clip | File                  | Start  | End    | Frames | Role
+1    | facecam1.MOV          | 0.0s   | 1.2s   | 0-36   | Hook — "This app literally pays you to go to bars"
+2    | etransfer-proof.png   | 1.2s   | 1.7s   | 36-51  | ⚡ FIRST CUT — $100 e-transfer proof (image insert)
+3    | winner-text.png       | 1.7s   | 2.2s   | 51-66  | Winner DM reaction
+4    | etransfer-proof2.png  | 2.2s   | 2.7s   | 66-81  | Second e-transfer proof
+     | (facecam1 AUDIO plays continuously under clips 2-4)
+5    | facecam2.MOV          | 2.7s   | 5.0s   | 81-150 | "You go out, rate a bar, earn points"
+6    | screen-rec @4.8s      | 5.0s   | 7.5s   | 150-225| Screen recording — submitting a bar
+7    | screen-rec @7.2s      | 7.5s   | 8.5s   | 225-255| Screen recording — points animation
+     | (facecam2 AUDIO plays continuously under clips 6-7)
+8    | facecam3.MOV          | 8.5s   | 14.0s  | 255-420| "Every point is a raffle entry..." + CTA
+9    | OUTRO (logo)          | 14.0s  | 16.0s  | 420-480| Nitely logo + "Link in bio"
+
+TEXT OVERLAYS:
+- "💰 +$100" at frame 330 (11.0s) — synced to word "hundred" — spring scale-in
+- "DOWNLOAD NITELY" at frame 375 (12.5s) — spring scale-in
+
+FLASH CUTS (3 frames, white, opacity 0.9):
+- Frame 36 (clip 1→2 boundary)
+- Frame 51 (clip 2→3)
+- Frame 66 (clip 3→4)
+- Frame 81 (clip 4→5)
+- Frame 150 (clip 5→6)
+- Frame 225 (clip 6→7)
+- Frame 255 (clip 7→8)
+- Frame 420 (clip 8→9)
+
+Z-INDEX LAYERING:
+- z0: Clip sequence (facecam + image inserts + screen recordings)
+- z10: Captions (word-by-word gold highlight, 130px from bottom)
+- z12: Text overlays ("+$100", "DOWNLOAD NITELY")
+- z30: Flash cuts
+
+WHY THIS SPEC WORKS:
+1. FIRST CUT AT 1.2s (frame 36) — mandatory visual change before 2 seconds
+2. Three rapid image inserts (1.2s-2.7s) — high visual energy, proves the claim
+3. Audio continuity — facecam voice plays UNDER image inserts, no dead air
+4. Screen recording split into 2 SHORT inserts (2.5s total) — never boring
+5. Flash cuts at EVERY boundary — punchy transitions
+6. Text overlays only at peak moments — clean, not cluttered
+7. Product name (Nitely) appears LAST — stickiness principle
+8. Total 16s — within the 15-20s sweet spot
+```
+
+**Use this as your baseline when building any reel.** The timeline table, flash cut placement, z-index layering, and audio continuity pattern should be replicated in every composition.
+
+---
+
 ## RULES THAT NEVER BEND
 
+- ALWAYS ensure a visual cut within the first 2 seconds (60 frames @30fps) — no exceptions
 - ALWAYS read the Remotion skills and production memory before starting work
 - ALWAYS run ffprobe before trusting any clip duration
 - ALWAYS build the timeline table before writing code
