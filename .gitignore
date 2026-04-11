@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+
+# Build output
+out/
+dist/
+
+# Raw video & audio files (too large for git — sync via AirDrop/Drive)
+*.MOV
+*.mov
+*.mp4
+*.MP4
+*.wav
+*.mp3
+*.m4a
+
+# Images (sync via AirDrop/Drive with the clips)
+*.png
+*.PNG
+*.jpg
+*.JPG
+*.jpeg
+*.JPEG
+*.heic
+*.HEIC
+
+# Whisper (local tool, not part of the project)
+whisper.cpp/
+
+# Generated docs (deliverables, not part of the repo)
+*.pdf
+*.docx
+
+# One-off scripts
+generate_marketing_pdf.py
+
+# Generated build artifacts (Claude regenerates these)
+public/reels/*/captions.json
+public/reels/*/voiceover.wav
+public/reels/*/build-log.md
+public/reels/*/claude-output.txt
+public/reels/*/spec.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
