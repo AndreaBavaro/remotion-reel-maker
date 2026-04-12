@@ -209,6 +209,124 @@ Do not both edit the same reel at the same time. Work on different reels and you
 
 ---
 
+## Part 7B: Writing a Brief
+
+A brief is a plain text file that tells Claude exactly what reel to build. You don't need to write one if you're dropping raw clips and letting Claude plan it — but if you know what you want, a brief gets you there faster and skips the planning questions.
+
+Save it as `brief.txt` inside the reel folder (e.g. `public/reels/reel7/brief.txt`).
+
+### Brief format
+
+```
+=== REEL BRIEF ===
+
+CONCEPT: [One sentence — what's this reel about?]
+
+VIBE: [Funny / urgent / informative / aspirational / FOMO / debate-starter]
+
+CLIPS (in order they should appear):
+1. [filename or description] — [What this clip shows]
+2. [filename or description] — [What this clip shows]
+3. [filename or description] — [What this clip shows]
+
+CAPTION SCRIPT: Generate from audio.
+
+TEXT OVERLAYS:
+- "[text]" appears during clip [X]
+
+FACECAM: [yes / no]
+
+BACKGROUND MUSIC: [filename or "none"]
+
+CTA: [e.g. "Download Nitely for a chance to win"]
+
+NOTES: [Anything extra — pacing, speed changes, audio continuity, energy]
+
+=== END BRIEF ===
+```
+
+### What each field means
+
+**CONCEPT** — One sentence describing what the reel is about. This anchors everything else.
+> Example: `Show that Nitely pays real people real money every week`
+
+**VIBE** — The emotional tone. Pick one or combine:
+> `urgent` / `funny` / `informative` / `aspirational` / `FOMO` / `debate-starter`
+
+**CLIPS** — List clips in the order you want them to appear. You don't need exact filenames — describe the clip and Claude will match the right file. If you know the filename, use it.
+> Example:
+> ```
+> 1. facecam1.MOV — me saying "this app literally pays you to go out"
+> 2. etransfer.png — $100 e-transfer proof screenshot
+> 3. winner-text.png — DM from a winner saying "no way"
+> 4. screen-rec.MOV — app demo, scrolling through bars
+> 5. facecam2.MOV — me explaining how points work
+> ```
+
+**CAPTION SCRIPT** — Almost always leave this as `Generate from audio`. Claude transcribes your actual voice using Whisper and builds captions from that. Only write a custom script if there's no spoken audio (e.g. a music-only reel).
+
+**TEXT OVERLAYS** — Big bold text that pops up on screen for emphasis. Optional but powerful for key moments.
+> Example:
+> ```
+> - "$100 EVERY WEEK" appears during clip 1
+> - "💰 FREE ENTRY" appears during clip 4
+> - "DOWNLOAD NITELY" appears at the end
+> ```
+
+**FACECAM** — Whether any clips are talking-to-camera. Just yes or no. If yes, Claude treats those clips as full-screen with captions; other clips become visual inserts over the audio.
+
+**BACKGROUND MUSIC** — Filename of a music track in the reel folder, or `none`. Keep it low volume — voiceover takes priority.
+
+**CTA** — The closing call-to-action line. Always appears last.
+> Example: `Download Nitely — link in bio`
+
+**NOTES** — Anything that doesn't fit elsewhere. Common things to put here:
+> - "Clips 1, 2, 3 are one continuous script — keep audio playing through the inserts"
+> - "Speed up clip 4 to feel snappier"
+> - "Reel should be under 20 seconds total"
+> - "Use flash cuts between every clip"
+
+### A complete example
+
+```
+=== REEL BRIEF ===
+
+CONCEPT: Prove that Nitely pays real people $100 every week
+
+VIBE: urgent, FOMO
+
+CLIPS:
+1. facecam1.MOV — hook: "this app literally pays you to go to bars"
+2. etransfer1.png — $100 e-transfer to a winner
+3. winner-text.png — DM reaction from the winner
+4. facecam2.MOV — explaining how points work
+5. screen-rec.MOV — screen recording of the app, submitting a bar
+6. facecam3.MOV — "every point is a raffle entry, download now"
+
+CAPTION SCRIPT: Generate from audio.
+
+TEXT OVERLAYS:
+- "💰 +$100" appears during clip 3
+- "DOWNLOAD NITELY" appears during clip 6
+
+FACECAM: yes — clips 1, 2, 4, 6 are facecam
+
+BACKGROUND MUSIC: none
+
+CTA: Download Nitely for a chance to win — link in bio
+
+NOTES: Clips 1, 4, and 6 are one continuous script — audio plays through the image inserts. Keep reel under 18 seconds.
+
+=== END BRIEF ===
+```
+
+### Tips
+- You don't need perfect filenames. "the e-transfer screenshot" is enough — Claude will find the right file and confirm before building.
+- The CLIPS order is the order they appear on screen. Put your strongest moment first (the hook).
+- If you're not sure what to write, just drop clips in the folder and say "plan a reel from reel7" — Claude figures it all out without a brief.
+
+---
+
 ## Part 8: Quick Reference
 
 ### Folder Structure
@@ -252,7 +370,7 @@ When Claude asks for a screen recording, you can either:
 
 **setup.command won't open:** Right-click > Open > Open. macOS blocks new scripts the first time.
 
-**Preview does not open:** Make sure you ran setup.command first. If it still fails, open Terminal and run: `cd ~/Documents/Remotion && npx remotion studio`
+**Preview does not open:** Make sure you ran setup.command first. If it still fails, open Terminal and run: `cd ~/Projects/Remotion && npx remotion studio`
 
 **Claude can't find clips:** Make sure files are in the right folder (`public/reels/reel7/` not just `public/reels/`). Check that you selected the Remotion folder when starting Cowork.
 
