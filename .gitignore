@@ -27,6 +27,10 @@ dist/
 # Whisper (local tool, not part of the project)
 whisper.cpp/
 
+# Per-reel compositions are personal/local — each user generates their own
+# via the `edit reelN` workflow. Only the shared infra is tracked.
+src/reels/reel*/
+
 # Generated docs (deliverables, not part of the repo)
 *.pdf
 *.docx

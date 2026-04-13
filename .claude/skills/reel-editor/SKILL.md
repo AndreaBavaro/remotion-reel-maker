@@ -322,17 +322,126 @@ Wait.
 
 ---
 
-## PHASE 3: BUILD
+## PHASE 3: BUILD (uses the SimpleReel pattern)
 
-Once the user approves the spec:
+Every reel beyond reel1 uses the shared `src/reels/shared/SimpleReel.tsx` component. You do NOT build custom scenes per reel — you generate three small data files and SimpleReel does the rendering (clip sequencing, captions, flash cuts, hook overlay, end card, z-index layering).
 
-1. Put all clip durations in `src/constants/timing.ts` — this is the SINGLE SOURCE OF TRUTH. Every other file imports from here.
-2. Composition total length in `Root.tsx` is calculated from `timing.ts`
-3. Scene boundaries derive from clip groups in `timing.ts`
-4. Build components following z-index layering order
-5. Use spring animations for text entrances
-6. NEVER hardcode display text in scene components — use TextOverlay or CaptionOverlay components only
-7. After EVERY file change, run: `npx tsc --noEmit` — if it fails, fix the error before moving on
+Each reel lives in `src/reels/reelN/` with three files:
+
+```
+src/reels/reelN/
+  timing.ts      ← exports CLIPS array + TOTAL_FRAMES + END_CARD_FRAMES
+  captions.ts    ← exports CAPTIONS: Caption[] (absolute-timestamped)
+  ReelN.tsx      ← imports the three pieces and instantiates <SimpleReel>
+```
+
+### Step 1: Transcode iPhone HEVC clips to browser-playable MP4 (CRITICAL)
+
+iPhone .MOV files use HEVC, which Chromium cannot decode. Remotion Studio will throw `MEDIA_ELEMENT_ERROR: Format error`. Run this BEFORE generating any data files:
+
+```bash
+for f in public/reels/reelN/IMG_*.MOV; do
+  out="${f%.MOV}.mp4"
+  [ -f "$out" ] && continue
+  ffmpeg -y -i "$f" -c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p \
+    -movflags +faststart -c:a aac -b:a 128k "$out"
+done
+```
+
+The .mp4 files sit alongside the originals. All staticFile() paths in the generated `timing.ts` must reference `.mp4`, never `.MOV`.
+
+### Step 2: Generate `timing.ts`
+
+```ts
+// AUTO-GENERATED — represents the cut plan from Phase 2
+export const END_CARD_FRAMES = 60;
+export const CLIPS = [
+  { src: "reels/reelN/IMG_2671.mp4", durationInFrames: 135 },
+  { src: "reels/reelN/IMG_2672.mp4", durationInFrames: 210 },
+  // ...one entry per clip in playback order
+] as const;
+export const TOTAL_FRAMES = /* sum of clip frames + END_CARD_FRAMES */;
+```
+
+`durationInFrames` is the trimmed length you decided in Phase 2 (raw ffprobe duration × 30, trimmed to what's actually used). `TOTAL_FRAMES` MUST equal `CLIPS.reduce((s,c) => s + c.durationInFrames, 0) + END_CARD_FRAMES` — Root.tsx imports it.
+
+### Step 3: Generate `captions.ts`
+
+Read `reels/reelN/transcriptions.json` (Whisper output). For each clip in CLIPS, in order, walk its captions and emit absolute-timestamped entries:
+
+```ts
+import type { Caption } from "@remotion/captions";
+export const CAPTIONS: Caption[] = [
+  { text: "Let", startMs: 0, endMs: 270, timestampMs: 0, confidence: 1 },
+  { text: " me", startMs: 270, endMs: 680, timestampMs: 270, confidence: 1 },
+  // ...
+];
+```
+
+Rules:
+- Absolute timestamps — offset every caption's startMs/endMs by the cumulative ms of preceding clips (cumulativeFrames / 30 * 1000).
+- Drop fillers: `um`, `uh`, `like`, `so`, `basically`, lone `-`.
+- Drop captions whose `startMs` exceeds the trimmed clip duration.
+- Apply proper-noun corrections: `nightly` → `Nitely`, `Night ly` → `Nitely`, common Toronto neighbourhood spellings.
+- Apply any reel-specific corrections noted in Phase 2 (e.g., `awful` → `raffle` if Whisper misheard).
+
+### Step 4: Generate `ReelN.tsx`
+
+```tsx
+import React from "react";
+import { SimpleReel } from "../shared/SimpleReel";
+import { CLIPS, END_CARD_FRAMES } from "./timing";
+import { CAPTIONS } from "./captions";
+
+const HOOK_TEXT = "BIG HOOK\nIN 1.5S";   // ≤ 6 words, all caps, mandatory
+const CTA_TEXT = "Download Nitely\nLink in bio 👇";
+
+export const ReelN: React.FC = () => (
+  <SimpleReel
+    clips={CLIPS as unknown as { src: string; durationInFrames: number }[]}
+    captions={CAPTIONS}
+    hookText={HOOK_TEXT}
+    ctaText={CTA_TEXT}
+    endCardFrames={END_CARD_FRAMES}
+  />
+);
+```
+
+`HOOK_TEXT` is the visual that satisfies the mandatory <2s cut rule — SimpleReel paints it over the first 1.5s and flashes out. Always set it.
+
+### Step 5: Register the reel in `src/Root.tsx` (REQUIRED — easy to forget)
+
+Add the import at the top:
+```tsx
+import { ReelN } from "./reels/reelN/ReelN";
+import { TOTAL_FRAMES as REELN_TOTAL_FRAMES } from "./reels/reelN/timing";
+```
+
+Add the Composition inside the fragment:
+```tsx
+<Composition
+  id="ReelN"
+  component={ReelN}
+  width={1080}
+  height={1920}
+  fps={30}
+  durationInFrames={REELN_TOTAL_FRAMES}
+/>
+```
+
+If you skip this step, the reel exists on disk but won't appear in `npx remotion studio` and can't be rendered. In batch mode this is the most common silent failure — verify after every reel.
+
+### Step 6: Typecheck
+
+After every file change, run `npx tsc --noEmit`. If it fails, fix before moving on. Common failures:
+- Missing `Reel6` (or other) import in Root.tsx whose folder you didn't generate — remove it.
+- Passing `startFrom` to `<Video>` from `@remotion/media` — that prop is now `trimBefore`.
+
+### Why the SimpleReel pattern (and when NOT to use it)
+
+SimpleReel handles 90% of reels: facecam-talking with optional inserts, hook overlay, captions, end card. Use it by default.
+
+ONLY build custom scenes (the reel1 / NitelyReel pattern) when the brief calls for things SimpleReel doesn't do: animated chat bubbles, screen-recording carousels with synced text per insert, multi-layer B-roll over A-roll, picture-in-picture facecam over a screen recording. In those cases, build under `src/reels/reelN/` with whatever extra components you need, but still register in Root.tsx the same way.
 
 ---
 

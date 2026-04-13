@@ -118,33 +118,48 @@ if [[ -f "$WHISPER_DIR/main" ]] && [[ -f "$WHISPER_MODEL" ]]; then
 else
     echo "  → Installing Whisper.cpp (compiling from source)..."
 
-    # Clone and build whisper.cpp
+    # If whisper.cpp exists but is broken/empty (no Makefile), wipe it and re-clone
+    if [[ -d "$WHISPER_DIR" ]] && [[ ! -f "$WHISPER_DIR/Makefile" ]]; then
+        echo "  → Found incomplete whisper.cpp directory, removing and re-cloning..."
+        rm -rf "$WHISPER_DIR"
+    fi
+
+    # Clone whisper.cpp if not already present
     if [[ ! -d "$WHISPER_DIR" ]]; then
         git clone --depth 1 --branch v1.5.5 https://github.com/ggerganov/whisper.cpp.git "$WHISPER_DIR"
     fi
 
-    cd "$WHISPER_DIR"
-    make clean 2>/dev/null || true
-    make -j$(sysctl -n hw.ncpu) 2>&1 | tail -3
-
-    if [[ ! -f "$WHISPER_DIR/main" ]]; then
-        echo "  → ERROR: Whisper.cpp failed to compile."
-        echo "    You can still use Cowork, but transcription won't work automatically."
+    # Verify clone actually succeeded
+    if [[ ! -f "$WHISPER_DIR/Makefile" ]]; then
+        echo "  → ERROR: Failed to clone whisper.cpp (no Makefile found)."
+        echo "    Check your internet connection and re-run setup."
     else
-        echo "  → Whisper.cpp compiled ✓"
-    fi
+        cd "$WHISPER_DIR"
+        make clean 2>/dev/null || true
+        make -j$(sysctl -n hw.ncpu) 2>&1 | tail -3
 
-    # Download the base.en model
-    if [[ ! -f "$WHISPER_MODEL" ]]; then
-        echo "  → Downloading whisper model (148 MB, one-time download)..."
-        mkdir -p "$WHISPER_DIR/models"
-        bash "$WHISPER_DIR/models/download-ggml-model.sh" base.en
-
-        if [[ -f "$WHISPER_MODEL" ]]; then
-            echo "  → Whisper model downloaded ✓"
+        if [[ ! -f "$WHISPER_DIR/main" ]]; then
+            echo "  → ERROR: Whisper.cpp failed to compile."
+            echo "    You can still use Cowork, but transcription won't work automatically."
         else
-            echo "  → WARNING: Model download failed. Trying direct URL..."
-            curl -L -o "$WHISPER_MODEL" "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin"
+            echo "  → Whisper.cpp compiled ✓"
+        fi
+
+        # Download the base.en model
+        if [[ ! -f "$WHISPER_MODEL" ]]; then
+            echo "  → Downloading whisper model (148 MB, one-time download)..."
+            mkdir -p "$WHISPER_DIR/models"
+
+            if [[ -f "$WHISPER_DIR/models/download-ggml-model.sh" ]]; then
+                bash "$WHISPER_DIR/models/download-ggml-model.sh" base.en
+            fi
+
+            # Fallback to direct download if script missing or failed
+            if [[ ! -f "$WHISPER_MODEL" ]]; then
+                echo "  → Trying direct download..."
+                curl -L -o "$WHISPER_MODEL" "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin"
+            fi
+
             if [[ -f "$WHISPER_MODEL" ]]; then
                 echo "  → Whisper model downloaded ✓"
             else
@@ -152,9 +167,9 @@ else
                 echo "    Transcription in Cowork will need manual setup."
             fi
         fi
-    fi
 
-    cd "$PROJECT_DIR"
+        cd "$PROJECT_DIR"
+    fi
 fi
 
 # -----------------------------------------------------------

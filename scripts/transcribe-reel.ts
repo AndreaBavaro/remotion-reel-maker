@@ -47,7 +47,7 @@ async function ensureWhisperBinary(whisperPath: string): Promise<string> {
 
     // Compile
     console.log("Compiling whisper.cpp for Linux...");
-    execSync(`cd "${linuxBuildDir}" && make`, { stdio: "inherit" });
+    execSync(`cd "${linuxBuildDir}" && make clean && make -j4`, { stdio: "inherit" });
 
     return path.join(linuxBuildDir, "main");
   }
@@ -81,7 +81,8 @@ async function main() {
     process.exit(1);
   }
 
-  const projectRoot = process.cwd();
+  const projectRoot = process.env.PROJECT_ROOT || process.cwd();
+  process.chdir(os.tmpdir());
   const whisperPath = path.join(projectRoot, "whisper.cpp");
   const reelPath = path.join(projectRoot, "reels", reelFolder);
   const outputPath = path.join(reelPath, "transcriptions.json");

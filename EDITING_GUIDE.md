@@ -23,7 +23,7 @@ You now have a folder called `remotion-reel-maker` on your Desktop.
 - Open that folder
 - Double-click `setup.command`
 - If Mac says it can't be opened: right-click it > Open > Open
-- Wait for it to finish (about 5 minutes)
+- Wait for it to finish (about 5 minutes — installs ffmpeg, node packages, and the speech-to-text model)
 
 You're done with setup. You never have to do this again.
 
@@ -33,7 +33,7 @@ You're done with setup. You never have to do this again.
 
 **1.** Open the `remotion-reel-maker` folder on your Desktop
 
-**2.** Go into `reels` and make a new folder (name it whatever you want, like `reel1`)
+**2.** Go into `public/reels` and make a new folder (name it `reel1`, `reel2`, etc — pick the next free number)
 
 **3.** Drag your video clips and screenshots into that folder
 
@@ -43,25 +43,39 @@ You're done with setup. You never have to do this again.
 
 **6.** Type:
 
-> edit reel1
+> edit reel3
 
-**7.** Claude handles everything from there. It'll ask you a few questions (is the opening strong enough, want to add anything, etc). Just answer in plain English.
+(or whatever number you used)
 
-**8.** When it's done, double-click `preview.command` in the project folder to watch it. If you want changes, go back to Claude and tell it what to fix.
+**7.** Claude handles everything from there. It will:
+- Catalogue your clips and transcribe the speech
+- Convert iPhone HEVC clips to a browser-playable MP4
+- Generate the composition with captions, flash cuts, hook overlay, and end card
+- Ask you a few questions in plain English (is the opening strong enough, want to add anything, etc)
+- Register the reel in `src/Root.tsx` so it appears in the preview
 
-**9.** When you're happy, tell Claude "render it" and it saves the final video to the `out` folder. AirDrop it to your phone and post.
+**8.** When it's done, double-click `preview.command` in the project folder to watch it in your browser. If you want changes, go back to Claude and tell it what to fix.
+
+**9.** When you're happy, tell Claude "render it" and the final video saves to the `out` folder. AirDrop it to your phone and post.
 
 **Want to edit all reels at once?** Just type **"edit all reels"** and Claude processes every folder.
 
 ---
 
-## Syncing with Andrea
+## Syncing with your collaborator
 
-Before you start: open GitHub Desktop and click **Pull** (top of the screen).
+**Before you start:** open GitHub Desktop and click **Pull** (top of the screen).
 
-When you're done: type a short message at the bottom left (like "built reel1"), click **Commit to master**, then click **Push origin** at the top.
+**When you're done:** type a short message at the bottom left (like "built reel3"), click **Commit to master**, then click **Push origin** at the top.
 
-Video files are too big for GitHub. Share them with Andrea over AirDrop or Google Drive.
+**What gets pushed and what doesn't:**
+- ✅ Code changes (`src/`, `scripts/`, guides) — pushed automatically
+- ❌ Raw clips, transcoded MP4s, transcriptions, voiceovers — too big for git, stay local
+- ❌ Per-reel folders in `src/reels/reelN/` — these are personal to your local copy (you each generate your own)
+
+To share a finished reel video with your collaborator, AirDrop or Google Drive the file from the `out/` folder.
+
+If your collaborator wants to edit one of your reels, send them the raw clips from `public/reels/reelN/` over AirDrop or Drive — they drop them into the same folder name on their machine and run `edit reelN` themselves.
 
 ---
 
@@ -71,4 +85,8 @@ Video files are too big for GitHub. Share them with Andrea over AirDrop or Googl
 
 **Preview won't open** — double-click setup.command again
 
-**Claude can't find your clips** — make sure they're inside a folder in `reels/`, not just loose in the project
+**Claude can't find your clips** — make sure they're inside a folder under `public/reels/`, not just loose in the project
+
+**Browser shows "Format error" / "MEDIA_ELEMENT_ERROR"** — your iPhone clips are HEVC and need transcoding. Ask Claude: "transcode the clips in reelN" and it'll convert them.
+
+**Preview shows only NitelyReel and not your reel** — the per-reel folder under `src/reels/` is missing. Run `edit reelN` again to regenerate it.
