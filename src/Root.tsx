@@ -10,8 +10,6 @@ import { Reel4 } from "./reels/reel4/Reel4";
 import { TOTAL_FRAMES as REEL4_TOTAL_FRAMES } from "./reels/reel4/timing";
 import { Reel5 } from "./reels/reel5/Reel5";
 import { TOTAL_FRAMES as REEL5_TOTAL_FRAMES } from "./reels/reel5/timing";
-import { Reel6 } from "./reels/reel6/Reel6";
-import { TOTAL_FRAMES as REEL6_TOTAL_FRAMES } from "./reels/reel6/timing";
 
 export const RemotionRoot: React.FC = () => {
   return (
@@ -63,14 +61,6 @@ export const RemotionRoot: React.FC = () => {
         height={1920}
         fps={30}
         durationInFrames={REEL5_TOTAL_FRAMES}
-      />
-      <Composition
-        id="Reel6"
-        component={Reel6}
-        width={1080}
-        height={1920}
-        fps={30}
-        durationInFrames={REEL6_TOTAL_FRAMES}
       />
     </>
   );
