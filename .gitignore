@@ -45,6 +45,15 @@ public/reels/*/build-log.md
 public/reels/*/claude-output.txt
 public/reels/*/spec.json
 public/reels/*/transcriptions.json
+public/reels/*/brief.txt
+
+# Legacy reels/ directory (everything lives in public/reels/ now)
+reels/
+
+# One-off local files
+tmp.json
+transcribe-clips.ts
+transcribe-reel1.command
 
 # OS files
 .DS_Store
