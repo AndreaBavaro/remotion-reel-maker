@@ -166,7 +166,7 @@ After asset discovery is confirmed:
    ```bash
    npx tsx scripts/transcribe-reel.ts [reel-folder-name]
    ```
-   This handles audio extraction, whisper.cpp compilation (cross-platform), and model caching automatically. It saves `reels/[reel-folder]/transcriptions.json` with word-level timestamps for each clip.
+   This handles audio extraction, whisper.cpp compilation (cross-platform), and model caching automatically. It saves `public/reels/[reel-folder]/transcriptions.json` with word-level timestamps for each clip.
    
    **If `transcriptions.json` already exists**, skip transcription and read the existing file.
    **If transcription fails** (model not cached), tell the user to double-click `setup.command` first.
@@ -326,10 +326,10 @@ Wait.
 
 Every reel beyond reel1 uses the shared `src/reels/shared/SimpleReel.tsx` component. You do NOT build custom scenes per reel — you generate three small data files and SimpleReel does the rendering (clip sequencing, captions, flash cuts, hook overlay, end card, z-index layering).
 
-Each reel lives in `src/reels/reelN/` with three files:
+Each reel lives in `src/public/reels/reelN/` with three files:
 
 ```
-src/reels/reelN/
+src/public/reels/reelN/
   timing.ts      ← exports CLIPS array + TOTAL_FRAMES + END_CARD_FRAMES
   captions.ts    ← exports CAPTIONS: Caption[] (absolute-timestamped)
   ReelN.tsx      ← imports the three pieces and instantiates <SimpleReel>
@@ -340,7 +340,7 @@ src/reels/reelN/
 iPhone .MOV files use HEVC, which Chromium cannot decode. Remotion Studio will throw `MEDIA_ELEMENT_ERROR: Format error`. Run this BEFORE generating any data files:
 
 ```bash
-for f in public/reels/reelN/IMG_*.MOV; do
+for f in public/public/reels/reelN/IMG_*.MOV; do
   out="${f%.MOV}.mp4"
   [ -f "$out" ] && continue
   ffmpeg -y -i "$f" -c:v libx264 -preset veryfast -crf 20 -pix_fmt yuv420p \
@@ -356,8 +356,8 @@ The .mp4 files sit alongside the originals. All staticFile() paths in the genera
 // AUTO-GENERATED — represents the cut plan from Phase 2
 export const END_CARD_FRAMES = 60;
 export const CLIPS = [
-  { src: "reels/reelN/IMG_2671.mp4", durationInFrames: 135 },
-  { src: "reels/reelN/IMG_2672.mp4", durationInFrames: 210 },
+  { src: "public/reels/reelN/IMG_2671.mp4", durationInFrames: 135 },
+  { src: "public/reels/reelN/IMG_2672.mp4", durationInFrames: 210 },
   // ...one entry per clip in playback order
 ] as const;
 export const TOTAL_FRAMES = /* sum of clip frames + END_CARD_FRAMES */;
@@ -367,7 +367,7 @@ export const TOTAL_FRAMES = /* sum of clip frames + END_CARD_FRAMES */;
 
 ### Step 3: Generate `captions.ts`
 
-Read `reels/reelN/transcriptions.json` (Whisper output). For each clip in CLIPS, in order, walk its captions and emit absolute-timestamped entries:
+Read `public/reels/reelN/transcriptions.json` (Whisper output). For each clip in CLIPS, in order, walk its captions and emit absolute-timestamped entries:
 
 ```ts
 import type { Caption } from "@remotion/captions";
@@ -413,8 +413,8 @@ export const ReelN: React.FC = () => (
 
 Add the import at the top:
 ```tsx
-import { ReelN } from "./reels/reelN/ReelN";
-import { TOTAL_FRAMES as REELN_TOTAL_FRAMES } from "./reels/reelN/timing";
+import { ReelN } from "./public/reels/reelN/ReelN";
+import { TOTAL_FRAMES as REELN_TOTAL_FRAMES } from "./public/reels/reelN/timing";
 ```
 
 Add the Composition inside the fragment:
@@ -441,7 +441,7 @@ After every file change, run `npx tsc --noEmit`. If it fails, fix before moving 
 
 SimpleReel handles 90% of reels: facecam-talking with optional inserts, hook overlay, captions, end card. Use it by default.
 
-ONLY build custom scenes (the reel1 / NitelyReel pattern) when the brief calls for things SimpleReel doesn't do: animated chat bubbles, screen-recording carousels with synced text per insert, multi-layer B-roll over A-roll, picture-in-picture facecam over a screen recording. In those cases, build under `src/reels/reelN/` with whatever extra components you need, but still register in Root.tsx the same way.
+ONLY build custom scenes (the reel1 / NitelyReel pattern) when the brief calls for things SimpleReel doesn't do: animated chat bubbles, screen-recording carousels with synced text per insert, multi-layer B-roll over A-roll, picture-in-picture facecam over a screen recording. In those cases, build under `src/public/reels/reelN/` with whatever extra components you need, but still register in Root.tsx the same way.
 
 ---
 

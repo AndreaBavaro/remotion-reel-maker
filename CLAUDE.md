@@ -55,9 +55,8 @@ For every folder in `reels/` that contains video files:
 ## Project structure
 
 ```
-reels/              Video clips and images for each reel (reel1/, reel2/, etc.)
+public/reels/       Video clips and images for each reel (reel1/, reel2/, etc.)
 src/                Remotion source code (compositions Claude generates)
-public/             Static assets served by Remotion
 out/                Rendered .mp4 files
 scripts/            Transcription and batch processing scripts
 whisper.cpp/        Pre-compiled whisper.cpp + cached model (from setup.command)

@@ -103,7 +103,7 @@ This script:
 - Extracts audio from every video clip in the reel folder
 - Transcribes using whisper.cpp with the base.en model (cached locally by setup.command)
 - Handles macOS vs Linux (Cowork sandbox) automatically — recompiles whisper.cpp for Linux if needed
-- Saves word-level timestamps to `reels/[reel-folder]/transcriptions.json`
+- Saves word-level timestamps to `public/reels/[reel-folder]/transcriptions.json`
 - Auto-corrects "Nightly" → "Nitely"
 
 **If `transcriptions.json` already exists** in the reel folder (e.g., from a previous session or manual run), skip transcription and read the existing file.
@@ -111,7 +111,7 @@ This script:
 **If the transcription script fails** (e.g., model not cached yet), tell the user:
 > "Transcription needs the whisper model which isn't set up yet. Double-click `setup.command` in Finder — it takes about 2 minutes. Then come back and I'll continue."
 
-After transcription completes, read `reels/[reel-folder]/transcriptions.json` to get all text and timestamps.
+After transcription completes, read `public/reels/[reel-folder]/transcriptions.json` to get all text and timestamps.
 
 **NEVER use Whisper tiny model** — it misidentifies "Nitely" as "Nightly."
 

@@ -44,12 +44,7 @@ public/reels/*/voiceover.wav
 public/reels/*/build-log.md
 public/reels/*/claude-output.txt
 public/reels/*/spec.json
-reels/*/captions.json
-reels/*/voiceover.wav
-reels/*/build-log.md
-reels/*/claude-output.txt
-reels/*/spec.json
-reels/*/transcriptions.json
+public/reels/*/transcriptions.json
 
 # OS files
 .DS_Store

@@ -84,7 +84,7 @@ async function main() {
   const projectRoot = process.env.PROJECT_ROOT || process.cwd();
   process.chdir(os.tmpdir());
   const whisperPath = path.join(projectRoot, "whisper.cpp");
-  const reelPath = path.join(projectRoot, "reels", reelFolder);
+  const reelPath = path.join(projectRoot, "public", "reels", reelFolder);
   const outputPath = path.join(reelPath, "transcriptions.json");
 
   // Verify reel folder exists
