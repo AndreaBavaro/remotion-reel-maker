@@ -24,7 +24,12 @@ set -e
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$PROJECT_DIR"
 
-REELS_DIR="public/reels"
+# Support both reels/ and public/reels/ folder structures
+if [ -d "reels" ] && find "reels" -maxdepth 2 -type f \( -iname "*.mov" -o -iname "*.mp4" \) 2>/dev/null | grep -q .; then
+    REELS_DIR="reels"
+else
+    REELS_DIR="public/reels"
+fi
 OUT_DIR="out"
 LOG_FILE="$OUT_DIR/batch-log-$(date +%Y%m%d-%H%M%S).md"
 

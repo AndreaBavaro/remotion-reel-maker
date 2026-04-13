@@ -33,7 +33,7 @@ You're done with setup. You never have to do this again.
 
 **1.** Open the `remotion-reel-maker` folder on your Desktop
 
-**2.** Go into `public` > `reels` and make a new folder (name it whatever you want, like `reel7`)
+**2.** Go into `reels` and make a new folder (name it whatever you want, like `reel1`)
 
 **3.** Drag your video clips and screenshots into that folder
 
@@ -41,9 +41,9 @@ You're done with setup. You never have to do this again.
 
 **5.** Start a Cowork session and when it asks you to pick a folder, pick the `remotion-reel-maker` folder on your Desktop
 
-**6.** Type something like:
+**6.** Type:
 
-> I just added videos to public/reels/reel7 — make a reel out of them
+> edit reel1
 
 **7.** Claude handles everything from there. It'll ask you a few questions (is the opening strong enough, want to add anything, etc). Just answer in plain English.
 
@@ -51,13 +51,15 @@ You're done with setup. You never have to do this again.
 
 **9.** When you're happy, tell Claude "render it" and it saves the final video to the `out` folder. AirDrop it to your phone and post.
 
+**Want to edit all reels at once?** Just type **"edit all reels"** and Claude processes every folder.
+
 ---
 
 ## Syncing with Andrea
 
 Before you start: open GitHub Desktop and click **Pull** (top of the screen).
 
-When you're done: type a short message at the bottom left (like "built reel7"), click **Commit to master**, then click **Push origin** at the top.
+When you're done: type a short message at the bottom left (like "built reel1"), click **Commit to master**, then click **Push origin** at the top.
 
 Video files are too big for GitHub. Share them with Andrea over AirDrop or Google Drive.
 
@@ -69,4 +71,4 @@ Video files are too big for GitHub. Share them with Andrea over AirDrop or Googl
 
 **Preview won't open** — double-click setup.command again
 
-**Claude can't find your clips** — make sure they're inside a folder in `public/reels/`, not just loose in the project
+**Claude can't find your clips** — make sure they're inside a folder in `reels/`, not just loose in the project

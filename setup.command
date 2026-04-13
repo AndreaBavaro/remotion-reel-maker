@@ -22,7 +22,7 @@ echo ""
 # -----------------------------------------------------------
 # 1. Check for Xcode Command Line Tools (needed for git, etc.)
 # -----------------------------------------------------------
-echo "[1/6] Checking Xcode Command Line Tools..."
+echo "[1/7] Checking Xcode Command Line Tools..."
 if ! xcode-select -p &>/dev/null; then
     echo "  → Installing Xcode Command Line Tools (you may see a popup — click Install)..."
     xcode-select --install
@@ -36,7 +36,7 @@ fi
 # 2. Install Homebrew (if not already installed)
 # -----------------------------------------------------------
 echo ""
-echo "[2/6] Checking Homebrew..."
+echo "[2/7] Checking Homebrew..."
 if ! command -v brew &>/dev/null; then
     echo "  → Installing Homebrew (this may take a minute)..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -54,7 +54,7 @@ fi
 # 3. Install Node.js via Homebrew
 # -----------------------------------------------------------
 echo ""
-echo "[3/6] Checking Node.js..."
+echo "[3/7] Checking Node.js..."
 if ! command -v node &>/dev/null; then
     echo "  → Installing Node.js..."
     brew install node
@@ -67,7 +67,7 @@ fi
 # 4. Install ffmpeg (needed for video processing)
 # -----------------------------------------------------------
 echo ""
-echo "[4/6] Checking ffmpeg..."
+echo "[4/7] Checking ffmpeg..."
 if ! command -v ffmpeg &>/dev/null; then
     echo "  → Installing ffmpeg (this may take a few minutes)..."
     brew install ffmpeg
@@ -80,7 +80,7 @@ fi
 # 5. Install git-filter-repo (for repo maintenance)
 # -----------------------------------------------------------
 echo ""
-echo "[5/6] Checking git-filter-repo..."
+echo "[5/7] Checking git-filter-repo..."
 if ! command -v git-filter-repo &>/dev/null; then
     echo "  → Installing git-filter-repo..."
     brew install git-filter-repo
@@ -93,7 +93,7 @@ fi
 # 6. Install project dependencies (npm install)
 # -----------------------------------------------------------
 echo ""
-echo "[6/6] Installing project dependencies..."
+echo "[6/7] Installing project dependencies..."
 if [[ -f "$PROJECT_DIR/package.json" ]]; then
     cd "$PROJECT_DIR"
     npm install
@@ -105,11 +105,62 @@ else
 fi
 
 # -----------------------------------------------------------
-# Make preview.command executable
+# 7. Install and cache Whisper.cpp + model for transcription
 # -----------------------------------------------------------
-if [[ -f "$PROJECT_DIR/preview.command" ]]; then
-    chmod +x "$PROJECT_DIR/preview.command"
+echo ""
+echo "[7/7] Setting up Whisper (speech-to-text for captions)..."
+
+WHISPER_DIR="$PROJECT_DIR/whisper.cpp"
+WHISPER_MODEL="$WHISPER_DIR/models/ggml-base.en.bin"
+
+if [[ -f "$WHISPER_DIR/main" ]] && [[ -f "$WHISPER_MODEL" ]]; then
+    echo "  → Whisper already installed and model cached ✓"
+else
+    echo "  → Installing Whisper.cpp (compiling from source)..."
+
+    # Clone and build whisper.cpp
+    if [[ ! -d "$WHISPER_DIR" ]]; then
+        git clone --depth 1 --branch v1.5.5 https://github.com/ggerganov/whisper.cpp.git "$WHISPER_DIR"
+    fi
+
+    cd "$WHISPER_DIR"
+    make clean 2>/dev/null || true
+    make -j$(sysctl -n hw.ncpu) 2>&1 | tail -3
+
+    if [[ ! -f "$WHISPER_DIR/main" ]]; then
+        echo "  → ERROR: Whisper.cpp failed to compile."
+        echo "    You can still use Cowork, but transcription won't work automatically."
+    else
+        echo "  → Whisper.cpp compiled ✓"
+    fi
+
+    # Download the base.en model
+    if [[ ! -f "$WHISPER_MODEL" ]]; then
+        echo "  → Downloading whisper model (148 MB, one-time download)..."
+        mkdir -p "$WHISPER_DIR/models"
+        bash "$WHISPER_DIR/models/download-ggml-model.sh" base.en
+
+        if [[ -f "$WHISPER_MODEL" ]]; then
+            echo "  → Whisper model downloaded ✓"
+        else
+            echo "  → WARNING: Model download failed. Trying direct URL..."
+            curl -L -o "$WHISPER_MODEL" "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin"
+            if [[ -f "$WHISPER_MODEL" ]]; then
+                echo "  → Whisper model downloaded ✓"
+            else
+                echo "  → ERROR: Could not download whisper model."
+                echo "    Transcription in Cowork will need manual setup."
+            fi
+        fi
+    fi
+
+    cd "$PROJECT_DIR"
 fi
+
+# -----------------------------------------------------------
+# Make .command files executable
+# -----------------------------------------------------------
+chmod +x "$PROJECT_DIR"/*.command 2>/dev/null || true
 
 # -----------------------------------------------------------
 # Done!

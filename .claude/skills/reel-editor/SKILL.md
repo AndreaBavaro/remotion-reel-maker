@@ -162,19 +162,23 @@ After asset discovery is confirmed:
 4. If the brief says to speed up a clip, pre-process it with ffmpeg BEFORE importing:
    `ffmpeg -i input.MOV -filter:v "setpts=0.5*PTS" -an output.MOV`
    NEVER change playback speed inside Remotion — it requires recalculating everything
-5. Extract audio from each clip:
-   `ffmpeg -y -i public/reels/reel-XXX/clip1.MOV -vn -acodec pcm_s16le -ar 44100 -ac 1 /tmp/clip1_audio.wav`
+5. **Transcribe audio** — use the project's built-in transcription script:
+   ```bash
+   npx tsx scripts/transcribe-reel.ts [reel-folder-name]
+   ```
+   This handles audio extraction, whisper.cpp compilation (cross-platform), and model caching automatically. It saves `reels/[reel-folder]/transcriptions.json` with word-level timestamps for each clip.
+   
+   **If `transcriptions.json` already exists**, skip transcription and read the existing file.
+   **If transcription fails** (model not cached), tell the user to double-click `setup.command` first.
+   
 6. Concatenate all clip audio into a single voiceover file:
    ```
-   printf "file '/tmp/clip1_audio.wav'\nfile '/tmp/clip2_audio.wav'\n" > /tmp/concat.txt
-   ffmpeg -y -f concat -safe 0 -i /tmp/concat.txt -c copy public/reels/reel-XXX/voiceover.wav
+   ffmpeg -y -i clip1.MOV -i clip2.MOV -filter_complex "[0:a][1:a]concat=n=2:v=0:a=1" -ar 44100 -ac 1 reels/reel-XXX/voiceover.wav
    ```
-7. Run Whisper on each clip's audio individually (base model minimum — NEVER use tiny, it misidentifies "Nitely" as "Nightly"):
-   `whisper /tmp/clip1_audio.wav --model base --language en --word_timestamps True --output_format json --output_dir /tmp/whisper_out`
-8. Manually correct proper nouns in transcription output: Nitely (not Nightly), King West (not King's West), and any Toronto neighbourhood names
-9. Calculate absolute caption timestamps. Each Whisper output has timestamps relative to its own clip. Offset by clip position:
-   `absolute_startMs = clip_offset_ms + (whisper_word_start * 1000)`
-10. Assemble `captions.json` with `combineTokensWithinMilliseconds: 350`
+7. Read `transcriptions.json` and correct proper nouns: Nitely (not Nightly), King West (not King's West), and any Toronto neighbourhood names
+8. Calculate absolute caption timestamps. Each clip's timestamps in transcriptions.json are relative to that clip. Offset by clip position:
+   `absolute_startMs = clip_offset_ms + caption.startMs`
+9. Assemble `captions.json` with `combineTokensWithinMilliseconds: 350`
 
 ---
 

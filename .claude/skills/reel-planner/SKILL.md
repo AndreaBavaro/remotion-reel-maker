@@ -92,15 +92,26 @@ AUDIO (1):
 
 ## STEP 2: TRANSCRIBE ALL SPEECH
 
-Extract and transcribe audio from every video that has speech (facecam clips, any clip with talking):
+Use the project's built-in transcription script which handles whisper.cpp compilation and model caching automatically:
 
 ```bash
-# Extract audio
-ffmpeg -y -i [file] -vn -acodec pcm_s16le -ar 44100 -ac 1 /tmp/[name]_audio.wav
-
-# Transcribe with Whisper (ALWAYS base model or higher)
-whisper /tmp/[name]_audio.wav --model base --language en --word_timestamps True --output_format json --output_dir /tmp/whisper_out
+npx tsx scripts/transcribe-reel.ts [reel-folder-name]
+# Example: npx tsx scripts/transcribe-reel.ts reel1
 ```
+
+This script:
+- Extracts audio from every video clip in the reel folder
+- Transcribes using whisper.cpp with the base.en model (cached locally by setup.command)
+- Handles macOS vs Linux (Cowork sandbox) automatically — recompiles whisper.cpp for Linux if needed
+- Saves word-level timestamps to `reels/[reel-folder]/transcriptions.json`
+- Auto-corrects "Nightly" → "Nitely"
+
+**If `transcriptions.json` already exists** in the reel folder (e.g., from a previous session or manual run), skip transcription and read the existing file.
+
+**If the transcription script fails** (e.g., model not cached yet), tell the user:
+> "Transcription needs the whisper model which isn't set up yet. Double-click `setup.command` in Finder — it takes about 2 minutes. Then come back and I'll continue."
+
+After transcription completes, read `reels/[reel-folder]/transcriptions.json` to get all text and timestamps.
 
 **NEVER use Whisper tiny model** — it misidentifies "Nitely" as "Nightly."
 
