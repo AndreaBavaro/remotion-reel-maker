@@ -33,13 +33,20 @@ Before doing ANY work:
 
 ## STEP 1: SCAN & CATALOGUE EVERY ASSET
 
-Run immediately when the user points you to a folder or drops files:
+Run immediately when the user points you to a folder or drops files.
 
+**First, auto-transcode any iPhone .MOV files to browser-safe .mp4:**
+```bash
+npx tsx scripts/transcode-mov.ts [reel-folder]
+```
+This runs automatically and skips files already transcoded. After this, always reference the `.mp4` versions (not `.MOV`) in any composition code.
+
+**Then scan:**
 ```bash
 find public/reels/[reel-folder]/ -type f
 ```
 
-For EVERY file, catalogue it:
+For EVERY file, catalogue it (ignore `.MOV` files when a matching `.mp4` exists):
 
 ### Video files (.MOV, .mov, .mp4, .MP4)
 For each video:

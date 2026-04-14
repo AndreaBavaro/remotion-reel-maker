@@ -39,11 +39,18 @@ The user will NOT always provide exact filenames in the brief. They'll use descr
 
 Your job is to figure out which file is which.
 
+### Step 0.5: Auto-transcode .MOV to .mp4
+Before anything else, run the transcode script to convert iPhone HEVC clips to browser-safe H.264:
+```bash
+npx tsx scripts/transcode-mov.ts [reel-folder]
+```
+This creates a `.mp4` alongside each `.MOV`. It skips files already transcoded. **Always use the `.mp4` versions in compositions** — browsers cannot play HEVC `.MOV` files.
+
 ### Step 1: Scan the reel folder
 ```bash
 find public/reels/[reel-folder]/ -type f
 ```
-List every file with its extension and size. For videos, also run ffprobe to get duration. For images, note dimensions if relevant.
+List every file with its extension and size. For videos, also run ffprobe to get duration. For images, note dimensions if relevant. **Ignore .MOV files if a matching .mp4 exists** — the .mp4 is the transcoded version.
 
 ### Step 2: Match files to the brief
 Use filenames, extensions, file types, and context clues to map each file to the clip described in the brief:

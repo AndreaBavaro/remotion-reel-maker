@@ -43,6 +43,7 @@ For every folder in `reels/` that contains video files:
 
 ## Key rules (always apply)
 
+- **Auto-transcode first**: Before scanning or transcribing, run `npx tsx scripts/transcode-mov.ts [folder]` to convert iPhone HEVC .MOV files to browser-safe H.264 .mp4. Always use .mp4 in compositions — never .MOV
 - Visual cut within the first 2 seconds of every reel (mandatory)
 - Flash cuts between every clip transition
 - Captions generated from actual audio (never made up)

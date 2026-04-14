@@ -8,6 +8,7 @@ import {
 import fs from "fs";
 import { execSync } from "child_process";
 import os from "os";
+import { transcodeMovFiles } from "./transcode-mov";
 
 const MODEL = "base.en" as const;
 
@@ -92,6 +93,10 @@ async function main() {
     console.error(`Reel folder not found: ${reelPath}`);
     process.exit(1);
   }
+
+  // Auto-transcode .MOV → .mp4 (HEVC → H.264 for browser playback)
+  console.log("Checking for .MOV files to transcode...");
+  transcodeMovFiles(reelPath);
 
   // Find all video files (MOV and mp4)
   const videoFiles = fs

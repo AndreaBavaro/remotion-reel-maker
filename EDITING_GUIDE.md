@@ -91,6 +91,6 @@ If your collaborator wants to edit one of your reels, send them the raw clips fr
 
 **Claude can't find your clips** — make sure they're inside a folder under `public/reels/`, not just loose in the project
 
-**Browser shows "Format error" / "MEDIA_ELEMENT_ERROR"** — your iPhone clips are HEVC and need transcoding. Ask Claude: "transcode the clips in reelN" and it'll convert them.
+**Browser shows "Format error" / "MEDIA_ELEMENT_ERROR"** — this shouldn't happen (Claude auto-converts iPhone clips). If it does, tell Claude: "transcode the clips in reelN" and it'll fix it.
 
 **Preview shows only NitelyReel and not your reel** — the per-reel folder under `src/reels/` is missing. Run `edit reelN` again to regenerate it.
