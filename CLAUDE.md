@@ -65,6 +65,18 @@ whisper.cpp/        Pre-compiled whisper.cpp + cached model (from setup.command)
 .claude/memory/     Feedback log — user ratings teach the system
 ```
 
-## Transcription
+## Transcription & transcoding (MANDATORY — do not deviate)
 
-The project uses whisper.cpp for speech-to-text. The binary and model are cached locally in `whisper.cpp/` by `setup.command`. The script at `scripts/transcribe-reel.ts` handles everything automatically, including cross-platform compilation (macOS binary from setup vs Linux in Cowork sandbox).
+Everything is pre-installed by `setup.command`. Use ONLY the project scripts:
+
+1. **Transcode**: `npx tsx scripts/transcode-mov.ts [folder]` — converts iPhone HEVC .MOV → H.264 .mp4. Run this FIRST.
+2. **Transcribe**: `npx tsx scripts/transcribe-reel.ts [folder]` — extracts audio, runs whisper.cpp (base.en model), saves word-level timestamps to `public/reels/[folder]/transcriptions.json`.
+
+**Do NOT**:
+- Call `whisper` CLI directly
+- Use OpenAI Whisper API or any cloud transcription service
+- Install or download any additional transcription tools
+- Reference `.MOV` files in Remotion compositions (always use `.mp4`)
+- Use the whisper tiny model (it misidentifies "Nitely" as "Nightly")
+
+The scripts handle macOS vs Linux (Cowork sandbox) automatically. If they fail, tell the user to double-click `setup.command` first.

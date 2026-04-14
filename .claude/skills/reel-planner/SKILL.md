@@ -120,7 +120,7 @@ This script:
 
 After transcription completes, read `public/reels/[reel-folder]/transcriptions.json` to get all text and timestamps.
 
-**NEVER use Whisper tiny model** — it misidentifies "Nitely" as "Nightly."
+**MANDATORY**: `npx tsx scripts/transcribe-reel.ts` is the ONLY transcription method for this project. NEVER call whisper CLI directly, NEVER use OpenAI Whisper API, NEVER install or use any other transcription tool. The script uses the whisper.cpp binary and base.en model that were pre-installed by setup.command. Do NOT use the tiny model — it misidentifies "Nitely" as "Nightly."
 
 Correct proper nouns: Nitely, King West, Toronto neighbourhood names.
 

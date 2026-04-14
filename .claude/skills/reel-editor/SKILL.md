@@ -870,7 +870,8 @@ WHY THIS SPEC WORKS:
 - ALWAYS read the Remotion skills and production memory before starting work
 - ALWAYS run ffprobe before trusting any clip duration
 - ALWAYS build the timeline table before writing code
-- ALWAYS use Whisper base model or higher (NEVER tiny)
+- ALWAYS transcribe using `npx tsx scripts/transcribe-reel.ts [folder]` — this is the ONLY transcription method. NEVER call whisper CLI directly, NEVER use OpenAI Whisper API, NEVER use any other transcription tool. The script uses the whisper.cpp binary and model cached by setup.command.
+- ALWAYS transcode before anything else using `npx tsx scripts/transcode-mov.ts [folder]` — NEVER reference .MOV files in composition code, ONLY use .mp4
 - ALWAYS run `npx tsc --noEmit` after every file change
 - In interactive mode: ALWAYS present the spec and wait for user confirmation before building
 - In autonomous mode: log the spec and proceed without confirmation
@@ -893,8 +894,11 @@ ffmpeg -y -i public/reels/reel-XXX/clip1.MOV -vn -acodec pcm_s16le -ar 44100 -ac
 printf "file '/tmp/clip1_audio.wav'\nfile '/tmp/clip2_audio.wav'\n" > /tmp/concat.txt
 ffmpeg -y -f concat -safe 0 -i /tmp/concat.txt -c copy public/reels/reel-XXX/voiceover.wav
 
-# Whisper transcribe with word timestamps
-whisper /tmp/clip1_audio.wav --model base --language en --word_timestamps True --output_format json --output_dir /tmp/whisper_out
+# Transcode iPhone .MOV → browser-safe .mp4 (MANDATORY first step)
+npx tsx scripts/transcode-mov.ts reel-XXX
+
+# Transcribe all clips (MANDATORY — uses whisper.cpp from setup.command)
+npx tsx scripts/transcribe-reel.ts reel-XXX
 
 # Pre-speed a clip (do this BEFORE importing, never inside Remotion)
 ffmpeg -i input.MOV -filter:v "setpts=0.5*PTS" -an output-fast.MOV
